@@ -3,7 +3,7 @@ from tkinter.filedialog import askopenfilename
 from PIL import Image, ImageTk
 from tkinter import ttk
 # from image_ui import Zty
-from emnist_ui import emnist_ui
+from emnist_ui import Drawing
 
 
 class IntelliClassifier:
@@ -62,7 +62,7 @@ class IntelliClassifier:
         # Create a Toplevel window for digit_ui
         popup_window = tk.Toplevel(self.root)
         popup_window.title("Text Recognition")
-        digit_ui_instance = emnist_ui(popup_window)
+        digit_ui_instance = Drawing(popup_window)
         digit_ui_instance.wait_window()
         self.root.deiconify()
 

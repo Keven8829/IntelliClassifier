@@ -13,7 +13,7 @@ physical_device = tf.config.list_physical_devices("GPU")
 tf.config.experimental.set_memory_growth(physical_device[0], True)
 
 # Configuration to build model
-build_model = True
+build_model = False
 
 # load data from tensorflow dataset 
 dataset,ds_info = tfds.load(
@@ -37,7 +37,7 @@ def normalize_img(image, label):
 
 AUTOTUNE = tf.data.experimental.AUTOTUNE
 BATCH_SIZE = 128
-EPOCH = 20
+EPOCH = 2
 
 # Setup for train dataset
 ds_train = ds_train.map(normalize_img, num_parallel_calls=AUTOTUNE)
@@ -63,13 +63,10 @@ if build_model:
     # Build CNN Model
     model = tf.keras.models.Sequential(
         [
-            # keras.layers.InputLayer((28, 28, 1)),
             keras.layers.Conv2D(32, 3, activation="relu", input_shape=(28,28,1)),
             keras.layers.BatchNormalization(),
-            # keras.layers.MaxPooling2D(2),
             keras.layers.Conv2D(32,3,activation='relu'),
             keras.layers.BatchNormalization(),
-            # keras.layers.MaxPooling2D(2),
             keras.layers.Conv2D(32,5,activation='relu',padding='same'),
             keras.layers.BatchNormalization(),
             keras.layers.Dropout(0.4),
@@ -85,7 +82,6 @@ if build_model:
             keras.layers.Conv2D(128,4,activation='relu'),
             keras.layers.BatchNormalization(),
             keras.layers.Flatten(),
-            # Dense(256,activation='relu'),
             keras.layers.Dropout(0.3),
             keras.layers.Dense(62, activation="softmax"),
 
@@ -138,7 +134,7 @@ if build_model:
     # Save graph dan data
     history_dict = history.history # Extract training history
     history_df = pd.DataFrame(history_dict) # Convert to DataFrame
-    history_df.to_csv(f'data/training_history_{optimizer_train.lower()}.csv', index=False)# Save to CSV file
+    # history_df.to_csv(f'data/training_history_{optimizer_train.lower()}.csv', index=False)# Save to CSV file
 
     #show graph
     print(history.history.keys())
@@ -166,30 +162,6 @@ if build_model:
 
 # Class Label
 label_names = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-
-# Predict from split dataset to test the model before predict
-def predict_from_sample():
-    loaded_model = tf.keras.models.load_model("model/emnist.h5")
-    # Get one batch from the test dataset
-    for images, labels in ds_test.take(1):
-        # Predict using the loaded model
-        predictions = loaded_model.predict(images)
-
-        # Access individual prediction and label if needed
-        for i in range(len(predictions)):
-            prediction = predictions[i]
-            label = labels[i].numpy()
-
-            # Print or use prediction and label as needed
-            print(f"Predicted Label: {np.argmax(prediction)}, True Label: {label}")
-
-        # Visualize an example image from the batch
-        example_image = images[4].numpy().reshape(28, 28)
-        plt.imshow(example_image, cmap='gray')
-        # plt.title("{}".format())
-        plt.colorbar()
-        plt.show()
-
 
 def load_and_predict_image(image_path, optimizer_choice, top_n = 3):
     loaded_model = tf.keras.models.load_model(f"model/emnist_{optimizer_choice.lower()}.h5")
