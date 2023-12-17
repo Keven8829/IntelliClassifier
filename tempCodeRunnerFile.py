@@ -1,6 +1,13 @@
-:
-        #     image = Image.open(path)
-        #     photo = ImageTk.PhotoImage(image)
-        #     image_label = tk.Label(self.root, image=photo, bg="white")
-        #     image_label.photo = photo  # This line is crucial to prevent garbage collection
-        #     image_label.grid(row=1, column=0, 
+# Resize the image when the window is resized
+            def resize_image(event):
+                width = event.width
+                height = event.height
+                ratio = min(width / bg_image.width, height / bg_image.height)
+                new_width = int(bg_image.width * ratio)
+                new_height = int(bg_image.height * ratio)
+                bg_image = bg_image.resize((new_width, new_height), Image.ANTIALIAS)
+                bg_photo = ImageTk.PhotoImage(bg_image)
+                bg_label.config(image=bg_photo)
+                bg_label.image = bg_photo
+
+            self.root.bind('<Configure>', resize_image)
